@@ -1,0 +1,6 @@
+@MaximumGameStore_HostAddress = http://localhost:5241
+
+GET {{MaximumGameStore_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
