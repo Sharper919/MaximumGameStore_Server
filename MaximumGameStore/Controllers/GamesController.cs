@@ -74,20 +74,46 @@ namespace MaximumGameStore.Controllers
         }
 
         [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetGamesList(int id)
+        public async Task<IActionResult> GetGameById(int id)
         {
-            var games = await _context.Games
-                .Join(_context.GameImages,
-                    g => g.Id,
-                    gi => gi.GameId,
-                    (g, gi) => new
-                    {
-                        g.Id,
-                        g.Name,
-                        g.Price,
-                        gi.ImagePath
-                    }).Take(8).ToListAsync();
-            return Ok(games);
+            var game = await _context.Games
+            .Include(g => g.GameGenres)
+                .ThenInclude(gg => gg.Genre)
+            .Include(g => g.GameDevelopers)
+                .ThenInclude(gd => gd.Developer)
+            .Include(g => g.GameEngines)
+                .ThenInclude(ge => ge.Engine)
+            .Include(g => g.GamePublishers)
+                .ThenInclude(gp => gp.Publisher)
+            .Include(g => g.GameModes)
+                .ThenInclude(ge => ge.Mode)
+            .Include(g => g.GameImages)
+            .Include (g => g.Series)
+            .FirstOrDefaultAsync(g => g.Id == id);
+
+            if (game == null)
+                return NotFound();
+
+            var dto = new GameDetailsDto
+            {
+                Id = game.Id,
+                Title = game.Name,
+                Price = game.Price,
+                ReleaseDate = game.ReleaseDate,
+                Serie = game.Series?.Name,
+                Genres = game.GameGenres.Select(g => g.Genre.Name).ToList(),
+                Developers = game.GameDevelopers.Select(d => d.Developer.Name).ToList(),
+                Engines = game.GameEngines.Select(e => e.Engine.Name).ToList(),
+                Publishers = game.GamePublishers.Select(p => p.Publisher.Name).ToList(),
+                Modes = game.GameModes.Select(m => m.Mode.Name).ToList(),
+                Images = game.GameImages
+                    .OrderBy(i => i.SortOrder)
+                    .Select(i => i.ImagePath)
+                    .ToList()
+            };
+
+            return Ok(dto);
+
         }
 
     }
