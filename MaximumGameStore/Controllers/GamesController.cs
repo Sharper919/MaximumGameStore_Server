@@ -1,4 +1,5 @@
 ﻿using MaximumGameStore.Data;
+using MaximumGameStore.DTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,20 +16,60 @@ namespace MaximumGameStore.Controllers
             _context = context;
         }
 
-        [HttpGet("/")]
-        public async Task<IActionResult> GetGamesList()
+        [HttpGet]
+        public async Task<IActionResult> GetGames([FromQuery] string? search, [FromQuery] int? genreId, [FromQuery] int? developerId, [FromQuery] int? engineId)
         {
-            var games = await _context.Games
-                .Join(_context.GameImages,
-                    g => g.Id,
-                    gi => gi.GameId,
-                    (g, gi) => new
-                    {
-                        g.Id,
-                        g.Name,
-                        g.Price,
-                        gi.ImagePath
-                    }).Take(8).ToListAsync();
+            var query = _context.Games
+                .Include(g => g.GameGenres)
+                    .ThenInclude(gg => gg.Genre)
+                .Include(g => g.GameDevelopers)
+                    .ThenInclude(gd => gd.Developer)
+                .Include(g => g.GameEngines)
+                    .ThenInclude(ge => ge.Engine)
+                .Include(g => g.GameImages)
+                .AsQueryable();
+
+            // Пошук за назвою
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(g => g.Name.Contains(search));
+            }
+
+            // Фільтри
+            if (genreId.HasValue)
+            {
+                query = query.Where(g =>
+                    g.GameGenres.Any(gg => gg.GenreId == genreId));
+            }
+
+            if (developerId.HasValue)
+            {
+                query = query.Where(g =>
+                    g.GameDevelopers.Any(gd => gd.DeveloperId == developerId));
+            }
+
+            if (engineId.HasValue)
+            {
+                query = query.Where(g =>
+                    g.GameEngines.Any(ge => ge.EngineId == engineId));
+            }
+
+            var games = await query
+                .Select(g => new GameListItemDto
+                {
+                    Id = g.Id,
+                    Title = g.Name,
+                    Price = g.Price,
+                    MainImage = g.GameImages
+                        .Where(i => i.IsMain)
+                        .Select(i => i.ImagePath)
+                        .FirstOrDefault(),
+                    Genres = g.GameGenres
+                        .Select(gg => gg.Genre.Name)
+                        .ToList()
+                })
+                .ToListAsync();
+
             return Ok(games);
         }
 
