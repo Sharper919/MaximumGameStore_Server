@@ -3,6 +3,7 @@ using MaximumGameStore.DTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace MaximumGameStore.Controllers
 {
@@ -76,43 +77,40 @@ namespace MaximumGameStore.Controllers
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetGameById(int id)
         {
-            var game = await _context.Games
-            .Include(g => g.GameGenres)
-                .ThenInclude(gg => gg.Genre)
-            .Include(g => g.GameDevelopers)
-                .ThenInclude(gd => gd.Developer)
-            .Include(g => g.GameEngines)
-                .ThenInclude(ge => ge.Engine)
-            .Include(g => g.GamePublishers)
-                .ThenInclude(gp => gp.Publisher)
-            .Include(g => g.GameModes)
-                .ThenInclude(ge => ge.Mode)
-            .Include(g => g.GameImages)
-            .Include (g => g.Series)
-            .FirstOrDefaultAsync(g => g.Id == id);
+            var game = await _context.Games.Where(g => g.Id == id)
+                .Select(g => new GameDetailsDto
+                {
+                    Id = g.Id,
+                    Title = g.Name,
+                    Price = g.Price,
+                    ReleaseDate = g.ReleaseDate,
+                    Serie = g.Series != null ? g.Series.Name : null,
+                    Genres = g.GameGenres.Select(gg => gg.Genre.Name).ToList(),
+                    Developers = g.GameDevelopers.Select(gd => gd.Developer.Name).ToList(),
+                    Engines = g.GameEngines.Select(ge => ge.Engine.Name).ToList(),
+                    Publishers = g.GamePublishers.Select(gp => gp.Publisher.Name).ToList(),
+                    Modes = g.GameModes.Select(gm => gm.Mode.Name).ToList(),
+                    Requirements = g.SystemRequirements.Select(sr => new GameSystemRequirementsDto
+                    {
+                        Id = sr.Id,
+                        RequirementType = sr.RequirementType,
+                        Os = sr.Os,
+                        Cpu = sr.Cpu,
+                        Gpu = sr.Gpu,
+                        RamGb = sr.RamGb,
+                        StorageGb = sr.StorageGb,
+                        DirectX = sr.DirectX
+                    }).ToList(),
+                    Images = g.GameImages
+                            .OrderBy(gi => gi.SortOrder)
+                            .Select(gi => gi.ImagePath)
+                            .ToList()
+                }).FirstOrDefaultAsync();
 
             if (game == null)
                 return NotFound();
 
-            var dto = new GameDetailsDto
-            {
-                Id = game.Id,
-                Title = game.Name,
-                Price = game.Price,
-                ReleaseDate = game.ReleaseDate,
-                Serie = game.Series?.Name,
-                Genres = game.GameGenres.Select(g => g.Genre.Name).ToList(),
-                Developers = game.GameDevelopers.Select(d => d.Developer.Name).ToList(),
-                Engines = game.GameEngines.Select(e => e.Engine.Name).ToList(),
-                Publishers = game.GamePublishers.Select(p => p.Publisher.Name).ToList(),
-                Modes = game.GameModes.Select(m => m.Mode.Name).ToList(),
-                Images = game.GameImages
-                    .OrderBy(i => i.SortOrder)
-                    .Select(i => i.ImagePath)
-                    .ToList()
-            };
-
-            return Ok(dto);
+            return Ok(game);
 
         }
 

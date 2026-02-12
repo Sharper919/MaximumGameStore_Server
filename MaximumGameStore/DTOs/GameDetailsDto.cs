@@ -15,7 +15,7 @@
         public List<string> Publishers { get; set; } = new();
         public List<string> Modes { get; set; } = new();
 
-        //public List<string> Requirements { get; set; } = new();
+        public List<GameSystemRequirementsDto> Requirements { get; set; } = new();
 
         public List<string> Images { get; set; } = new();
 
