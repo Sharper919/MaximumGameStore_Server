@@ -393,7 +393,7 @@ public partial class MaximumGameStoreContext : DbContext
                 .HasColumnType("datetime");
             entity.Property(e => e.Email).HasMaxLength(255);
             entity.Property(e => e.Name).HasMaxLength(100);
-            entity.Property(e => e.Password).HasMaxLength(255);
+            entity.Property(e => e.PasswordHash).HasMaxLength(255);
         });
 
         OnModelCreatingPartial(modelBuilder);
