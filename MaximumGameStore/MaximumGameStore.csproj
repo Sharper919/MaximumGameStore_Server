@@ -18,4 +18,15 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\Images\games\1\" />
+    <Folder Include="wwwroot\Images\games\2\" />
+    <Folder Include="wwwroot\Images\games\3\" />
+    <Folder Include="wwwroot\Images\games\4\" />
+    <Folder Include="wwwroot\Images\games\5\" />
+    <Folder Include="wwwroot\Images\games\6\" />
+    <Folder Include="wwwroot\Images\games\7\" />
+    <Folder Include="wwwroot\Images\games\8\" />
+  </ItemGroup>
+
 </Project>
