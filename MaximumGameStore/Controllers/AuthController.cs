@@ -43,7 +43,15 @@ namespace MaximumGameStore.Controllers
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return Ok();
+            var token = _jwt.CreateToken(user);
+
+            var response = new AuthResponseDto
+            {
+                Token = token,
+                UserName = user.Name
+            };
+
+            return Ok(response);
         }
 
         [HttpPost("login")]
@@ -60,7 +68,13 @@ namespace MaximumGameStore.Controllers
 
             var token = _jwt.CreateToken(user);
 
-            return Ok(new { token });
+            var response = new AuthResponseDto
+            {
+                Token = token,
+                UserName = user.Name
+            };
+
+            return Ok(response);
         }
     }
 }
