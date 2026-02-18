@@ -85,6 +85,7 @@ namespace MaximumGameStore.Controllers
                     Price = g.Price,
                     ReleaseDate = g.ReleaseDate,
                     Serie = g.Series != null ? g.Series.Name : null,
+                    Description = g.Description,
                     Genres = g.GameGenres.Select(gg => gg.Genre.Name).ToList(),
                     Developers = g.GameDevelopers.Select(gd => gd.Developer.Name).ToList(),
                     Engines = g.GameEngines.Select(ge => ge.Engine.Name).ToList(),
