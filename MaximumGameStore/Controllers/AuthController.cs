@@ -26,16 +26,19 @@ namespace MaximumGameStore.Controllers
         [HttpPost("register")]
         public async Task<ActionResult> Register(RegisterDto dto)
         {
-            if (await _context.Users.AnyAsync(u => u.Email == dto.Email))
+            string email = dto.Email.Trim().ToLower();
+            string userName = dto.UserName.Trim();
+
+            if (await _context.Users.AnyAsync(u => u.Email == email && !u.IsDeleted))
                 return BadRequest("This email already exists");
 
-            if (await _context.Users.AnyAsync(u => u.Name == dto.UserName))
+            if (await _context.Users.AnyAsync(u => u.Name == userName && !u.IsDeleted))
                 return BadRequest("This user name already exists");
-
+            
             var user = new User
             {
-                Email = dto.Email,
-                Name = dto.UserName,
+                Email = email,
+                Name = userName,
                 PasswordHash = _hasher.Hash(dto.Password),
                 DateTimeRegistration = DateTime.UtcNow
             };
@@ -57,14 +60,16 @@ namespace MaximumGameStore.Controllers
         [HttpPost("login")]
         public async Task<ActionResult> Login(LoginDto dto)
         {
+            string userName = dto.UserName.Trim();
+
             var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Name == dto.UserName);
+                .FirstOrDefaultAsync(u => u.Name == userName && !u.IsDeleted);
 
             if (user == null)
-                return Unauthorized();
+                return Unauthorized("This user does not exist");
 
             if (!_hasher.Verify(dto.Password, user.PasswordHash))
-                return Unauthorized();
+                return Unauthorized("Incorrect password");
 
             var token = _jwt.CreateToken(user);
 
