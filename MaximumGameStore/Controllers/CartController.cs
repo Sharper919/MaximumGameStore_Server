@@ -102,6 +102,22 @@ namespace MaximumGameStore.Controllers
             return Ok(new { message = "Game removed from cart" });
         }
 
+        [HttpDelete("clear")]
+        public async Task<IActionResult> ClearCart()
+        {
+            int userId = GetUserId();
+
+            var cart = await GetOrCreateActiveCart(userId);
+
+            var items = _context.CartItems.Where(ci => ci.CartId == cart.Id);
+
+            _context.CartItems.RemoveRange(items);
+            cart.DateTimeUpdate = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Cart cleared" });
+        }
+
         private async Task<Cart> GetOrCreateActiveCart(int userId)
         {
             var cart = await _context.Carts
