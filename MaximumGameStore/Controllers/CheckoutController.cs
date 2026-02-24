@@ -101,6 +101,72 @@ namespace MaximumGameStore.Controllers
             }
         }
 
+        [HttpPost("buy-now/{gameId:int}")]
+        public async Task<IActionResult> BuyNow(int gameId, CheckoutDto dto)
+        {
+            int userId = GetUserId();
+
+            var owned = await _context.OrderItems
+                .AnyAsync(oi => oi.GameId == gameId && oi.Order.UserId == userId && oi.Order.Status == "Paid");
+
+            if (owned) BadRequest("You already own this game");
+
+            var game = await _context.Games.FindAsync(gameId);
+
+            if (game == null) return NotFound("Game not found");
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                var order = new Order
+                {
+                    UserId = userId,
+                    DateTimeOrder = DateTime.UtcNow,
+                    TotalAmount = game.Price,
+                    Status = "Paid"
+                };
+
+                _context.Orders.Add(order);
+                await _context.SaveChangesAsync();
+
+                var item = new OrderItem
+                {
+                    OrderId = order.Id,
+                    GameId = gameId,
+                    PriceAtPurchase = game.Price
+                };
+
+                _context.OrderItems.Add(item);
+
+                var payment = new CardPayment
+                {
+                    OrderId = order.Id,
+                    CardLast4 = dto.CardNumber[^4..],
+                    CardType = dto.CardType,
+                    DateTimePayment = DateTime.UtcNow,
+                    Amount = game.Price,
+                    PaymentStatus = "Paid"
+                };
+
+                _context.CardPayments.Add(payment);
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+
+                return Ok(new
+                {
+                    Message = "Game purchased successfully",
+                    OrderId = order.Id
+                });
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                return StatusCode(500, "Checkout failed");
+            }
+        }
+
         private int GetUserId()
         {
             var Id = User.FindFirstValue(ClaimTypes.NameIdentifier);
