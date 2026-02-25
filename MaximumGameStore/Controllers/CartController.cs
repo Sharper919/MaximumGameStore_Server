@@ -132,10 +132,10 @@ namespace MaximumGameStore.Controllers
                     DateTimeUpdate = DateTime.UtcNow,
                     Status = "Active"
                 };
+            
+                _context.Carts.Add(cart);
+                await _context.SaveChangesAsync();
             }
-
-            _context.Carts.Add(cart);
-            await _context.SaveChangesAsync();
 
             return cart;
         }

@@ -124,7 +124,7 @@ namespace MaximumGameStore.Controllers
                     UserId = userId,
                     DateTimeOrder = DateTime.UtcNow,
                     TotalAmount = game.Price,
-                    Status = "Paid"
+                    Status = "Success"
                 };
 
                 _context.Orders.Add(order);
