@@ -6,7 +6,5 @@
         public string Title { get; set; } = null!;
         public decimal Price { get; set; }
         public string? MainImage { get; set; }
-
-        public List<string> Genres { get; set; } = new();
     }
 }
