@@ -1,5 +1,6 @@
 using MaximumGameStore.Data;
 using MaximumGameStore.Services;
+using MaximumGameStore.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -23,6 +24,7 @@ namespace MaximumGameStore
 
             builder.Services.AddScoped<PasswordHasher>();
             builder.Services.AddScoped<JwtService>();
+            builder.Services.AddScoped<IGameService, GameService>();
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
