@@ -68,28 +68,6 @@ namespace MaximumGameStore.Controllers
             return Ok(userGames);
         }
 
-        //[HttpPut("update")]
-        //public async Task<IActionResult> UpdateUser(UpdateUserDto dto)
-        //{
-        //    int userId = GetUserId();
-        //    PasswordHasher hasher = new PasswordHasher();
-
-        //    var user = await _context.Users.FindAsync(userId);
-
-        //    if(user == null || user.IsDeleted) return NotFound();
-
-        //    user.Name = dto.UserName;
-
-        //    if (!string.IsNullOrWhiteSpace(dto.NewPassword))
-        //    {
-        //        user.PasswordHash = hasher.Hash(dto.NewPassword);
-        //    }
-
-        //    await _context.SaveChangesAsync();
-
-        //    return Ok(new { message = "Updated" });
-        //}
-
         [HttpPut("update/username")]
         public async Task<IActionResult> UpdateUserName(UpdateUserNameDto dto)
         {
