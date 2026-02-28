@@ -2,6 +2,8 @@
 using MaximumGameStore.DTOs;
 using MaximumGameStore.Models;
 using MaximumGameStore.Services;
+using MaximumGameStore.Services.Interfaces;
+using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,47 +14,20 @@ namespace MaximumGameStore.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly MaximumGameStoreContext _context;
-        private readonly PasswordHasher _hasher;
-        private readonly JwtService _jwt;
+        private readonly IAuthService _authService;
 
-        public AuthController(MaximumGameStoreContext context, PasswordHasher hasher, JwtService jwt)
+        public AuthController(IAuthService authService)
         {
-            _context = context;
-            _hasher = hasher;
-            _jwt = jwt;
+            _authService = authService;
         }
 
         [HttpPost("register")]
         public async Task<ActionResult> Register(RegisterDto dto)
         {
-            string email = dto.Email.Trim().ToLower();
-            string userName = dto.UserName.Trim();
+            var response = await _authService.AddUserAsync(dto);
 
-            if (await _context.Users.AnyAsync(u => u.Email == email && !u.IsDeleted))
-                return BadRequest("This email already exists");
-
-            if (await _context.Users.AnyAsync(u => u.Name == userName && !u.IsDeleted))
-                return BadRequest("This user name already exists");
-            
-            var user = new User
-            {
-                Email = email,
-                Name = userName,
-                PasswordHash = _hasher.Hash(dto.Password),
-                DateTimeRegistration = DateTime.UtcNow
-            };
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            var token = _jwt.CreateToken(user);
-
-            var response = new AuthResponseDto
-            {
-                Token = token,
-                UserName = user.Name
-            };
+            if (response == null)
+                return BadRequest("This email or user name already exists");
 
             return Ok(response);
         }
@@ -60,24 +35,9 @@ namespace MaximumGameStore.Controllers
         [HttpPost("login")]
         public async Task<ActionResult> Login(LoginDto dto)
         {
-            string userName = dto.UserName.Trim();
+            var response = await _authService.AuthenticateAsync(dto);
 
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Name == userName && !u.IsDeleted);
-
-            if (user == null)
-                return Unauthorized("This user does not exist");
-
-            if (!_hasher.Verify(dto.Password, user.PasswordHash))
-                return Unauthorized("Incorrect password");
-
-            var token = _jwt.CreateToken(user);
-
-            var response = new AuthResponseDto
-            {
-                Token = token,
-                UserName = user.Name
-            };
+            if (response == null) return BadRequest("Invalid credentials");
 
             return Ok(response);
         }
