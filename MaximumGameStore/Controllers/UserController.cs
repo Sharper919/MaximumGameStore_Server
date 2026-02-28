@@ -41,9 +41,6 @@ namespace MaximumGameStore.Controllers
                     CreatedAt = ui.DateTimeRegistration
                 }).FirstOrDefaultAsync();
 
-            if(userInfo == null)
-                return NotFound();
-
             return Ok(userInfo);
         }
 
@@ -62,8 +59,6 @@ namespace MaximumGameStore.Controllers
                         .Select(gi => gi.ImagePath).FirstOrDefault(),
                     PurchasedAt = oi.Order.DateTimeOrder
                 }).Distinct().ToListAsync();
-
-            if(userGames == null) return NotFound();
 
             return Ok(userGames);
         }
