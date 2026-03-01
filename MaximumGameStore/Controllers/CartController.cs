@@ -1,11 +1,6 @@
-﻿using MaximumGameStore.Data;
-using MaximumGameStore.DTOs;
-using MaximumGameStore.Models;
-using MaximumGameStore.Services.Interfaces;
+﻿using MaximumGameStore.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace MaximumGameStore.Controllers
