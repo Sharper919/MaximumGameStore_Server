@@ -1,6 +1,6 @@
 ﻿using MaximumGameStore.Data;
 using MaximumGameStore.DTOs;
-using MaximumGameStore.Services;
+using MaximumGameStore.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,11 +14,11 @@ namespace MaximumGameStore.Controllers
     [Authorize]
     public class UserController : ControllerBase
     {
-        private readonly MaximumGameStoreContext _context;
+        private readonly IUserService _userService;
 
-        public UserController(MaximumGameStoreContext context)
+        public UserController(IUserService userService)
         {
-            _context = context;
+            _userService = userService;
         }
 
         private int GetUserId()
@@ -32,14 +32,7 @@ namespace MaximumGameStore.Controllers
         {
             int userId = GetUserId();
 
-            var userInfo = await _context.Users.Where(u => u.Id == userId)
-                .Select(ui => new UserInfoDto
-                {
-                    Id = ui.Id,
-                    UserName = ui.Name,
-                    Email = ui.Email,
-                    CreatedAt = ui.DateTimeRegistration
-                }).FirstOrDefaultAsync();
+            var userInfo = await _userService.GetUserInfoAsync(userId);
 
             return Ok(userInfo);
         }
@@ -49,16 +42,7 @@ namespace MaximumGameStore.Controllers
         {
             int userId = GetUserId();
 
-            var userGames = await _context.OrderItems.Where(oi => oi.Order.UserId == userId)
-                .Select(oi => new UserGamesDto
-                {
-                    Id = oi.Id,
-                    Title = oi.Game.Name,
-                    Price = oi.PriceAtPurchase,
-                    MainImage = oi.Game.GameImages.Where(gi => gi.IsMain)
-                        .Select(gi => gi.ImagePath).FirstOrDefault(),
-                    PurchasedAt = oi.Order.DateTimeOrder
-                }).Distinct().ToListAsync();
+            var userGames = await _userService.GetUserGamesAsync(userId);
 
             return Ok(userGames);
         }
@@ -67,46 +51,35 @@ namespace MaximumGameStore.Controllers
         public async Task<IActionResult> UpdateUserName(UpdateUserNameDto dto)
         {
             int userId = GetUserId();
-            string newUserName = dto.NewUserName.Trim();
 
-            var user = await _context.Users.FindAsync(userId);
+            string result = await _userService.UpdateUserNameAsync(userId, dto);
 
-            if (user == null || user.IsDeleted) return NotFound();
+            if (result == "Not found") return NotFound();
 
-            if (string.IsNullOrWhiteSpace(newUserName))
-                return BadRequest("Username is empty");
+            if (result == "Username is empty")
+                return BadRequest(result);
 
-            bool exists = await _context.Users
-                .AnyAsync(u => u.Name == newUserName && u.Id != userId && !u.IsDeleted);
+            if (result == "Username already taken") return BadRequest(result);
 
-            if (exists) return BadRequest("Username already taken");
-
-            user.Name = newUserName;
-            await _context.SaveChangesAsync();
-
-            return Ok(new { message = "UserName Updated" });
+            return Ok(new { message = result });
         }
 
         [HttpPut("update/password")]
         public async Task<IActionResult> UpdateUserPassword(UpdateUserPasswordDto dto)
         {
             int userId = GetUserId();
-            PasswordHasher hasher = new PasswordHasher();
 
-            var user = await _context.Users.FindAsync(userId);
+            var result = await _userService.UpdateUserPasswordAsync(userId, dto);
 
-            if (user == null || user.IsDeleted) return NotFound();
+            if (result == "Not found") return NotFound();
 
-            if (!hasher.Verify(dto.OldPassword, user.PasswordHash))
-                return BadRequest(new { message = "Old password is incorrect" });
+            if (result == "Old password is incorrect")
+                return BadRequest(result);
 
-            if (hasher.Verify(dto.NewPassword, user.PasswordHash))
-                return BadRequest(new { message = "This is the old password" });
+            if (result == "This is the old password")
+                return BadRequest(result);
 
-            user.PasswordHash = hasher.Hash(dto.NewPassword);
-            await _context.SaveChangesAsync();
-
-            return Ok(new { message = "Password Updated" });
+            return Ok(new { message = result });
         }
 
         [HttpPut("delete")]
@@ -114,14 +87,11 @@ namespace MaximumGameStore.Controllers
         {
             int userId = GetUserId();
 
-            var user = await _context.Users.FindAsync(userId);
+            string result = await _userService.DeleteUserAsync(userId);
 
-            if(user == null || user.IsDeleted) return NotFound();
+            if (result == "Not found") return NotFound();
 
-            user.IsDeleted = true;
-            await _context.SaveChangesAsync();
-
-            return Ok(new { message = "Account deactivated" });
+            return Ok(new { message = result });
         }
     }
 }
