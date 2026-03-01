@@ -1,12 +1,5 @@
-﻿using MaximumGameStore.Data;
-using MaximumGameStore.DTOs;
-using MaximumGameStore.Models;
-using MaximumGameStore.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
+﻿using MaximumGameStore.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace MaximumGameStore.Controllers
 {
