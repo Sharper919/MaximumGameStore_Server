@@ -27,6 +27,7 @@ namespace MaximumGameStore
             builder.Services.AddScoped<IGameService, GameService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<ICartService, CartService>();
 
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

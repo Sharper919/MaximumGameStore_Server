@@ -1,6 +1,7 @@
 ﻿using MaximumGameStore.Data;
 using MaximumGameStore.DTOs;
 using MaximumGameStore.Models;
+using MaximumGameStore.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,38 +15,17 @@ namespace MaximumGameStore.Controllers
     [Authorize]
     public class CartController : ControllerBase
     {
-        private readonly MaximumGameStoreContext _context;
-
-        public CartController(MaximumGameStoreContext context)
+        private readonly ICartService _cartService;
+        public CartController(ICartService cartService)
         {
-            _context = context;
+            _cartService = cartService;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetCart()
         {
             int userId = GetUserId();
-
-            var cart = await GetOrCreateActiveCart(userId);
-
-            var items = await _context.CartItems.Where(ci => ci.CartId == cart.Id)
-                .Select(ci => new CartItemDto
-                {
-                    GameId = ci.GameId,
-                    Title = ci.Game.Name,
-                    Price = ci.Game.Price,
-                    Image = ci.Game.GameImages.Where(gi => gi.IsMain)
-                            .Select(gi => gi.ImagePath)
-                            .FirstOrDefault(),
-
-                }).ToListAsync();
-
-            return Ok(new CartDto
-            {
-                CartId = cart.Id,
-                CartItems = items,
-                TotalPrice = items.Sum(i => i.Price)
-            });
+            return Ok(await _cartService.GetCartAsync(userId));
         }
 
         [HttpPost("add/{gameId:int}")]
@@ -53,34 +33,13 @@ namespace MaximumGameStore.Controllers
         {
             int userId = GetUserId();
 
-            var game = await _context.Games.FindAsync(gameId);
+            var result = await _cartService.AddGameAsync(userId, gameId);
 
-            if (game == null) return NotFound("Game not found");
+            if (result == "Game not found") return NotFound();
+            if (result == "You already own this game") return BadRequest(result);
+            if (result == "Game already in cart") return BadRequest(result);
 
-            bool alreadyOwned = await _context.OrderItems
-                .AnyAsync(oi => oi.GameId == gameId && oi.Order.UserId == userId);
-
-            if (alreadyOwned) return BadRequest("You already own this game");
-
-            var cart = await GetOrCreateActiveCart(userId);
-
-            bool exist = await _context.CartItems
-                .AnyAsync(ci => ci.GameId == gameId && ci.CartId == cart.Id);
-
-            if (exist) return BadRequest("Game already in cart");
-
-            CartItem cartItem = new CartItem
-            {
-                CartId = cart.Id,
-                GameId = game.Id,
-                DateTimeAdded = DateTime.UtcNow
-            };
-
-            _context.CartItems.Add(cartItem);
-            cart.DateTimeUpdate = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
-
-            return Ok(new { message = "Game added to cart" });
+            return Ok(new { message = result });
         }
 
         [HttpDelete("remove/{gameId:int}")]
@@ -88,18 +47,11 @@ namespace MaximumGameStore.Controllers
         {
             int userId = GetUserId();
 
-            var cart = await GetOrCreateActiveCart(userId);
+            var result = await _cartService.RemoveGameAsync(userId, gameId);
 
-            var item = await _context.CartItems
-                .FirstOrDefaultAsync(ci => ci.GameId == gameId && ci.CartId == cart.Id);
+            if (result == "Not found") return NotFound();
 
-            if (item == null) return NotFound();
-
-            _context.CartItems.Remove(item);
-            cart.DateTimeUpdate = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
-
-            return Ok(new { message = "Game removed from cart" });
+            return Ok(new { message = result });
         }
 
         [HttpDelete("clear")]
@@ -107,37 +59,9 @@ namespace MaximumGameStore.Controllers
         {
             int userId = GetUserId();
 
-            var cart = await GetOrCreateActiveCart(userId);
+            var result = await _cartService.ClearCartAsync(userId);
 
-            var items = _context.CartItems.Where(ci => ci.CartId == cart.Id);
-
-            _context.CartItems.RemoveRange(items);
-            cart.DateTimeUpdate = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
-
-            return Ok(new { message = "Cart cleared" });
-        }
-
-        private async Task<Cart> GetOrCreateActiveCart(int userId)
-        {
-            var cart = await _context.Carts
-                .FirstOrDefaultAsync(c => c.UserId == userId && c.Status == "Active");
-
-            if(cart == null)
-            {
-                cart = new Cart
-                {
-                    UserId = userId,
-                    DateTimeCreation = DateTime.UtcNow,
-                    DateTimeUpdate = DateTime.UtcNow,
-                    Status = "Active"
-                };
-            
-                _context.Carts.Add(cart);
-                await _context.SaveChangesAsync();
-            }
-
-            return cart;
+            return Ok(new { message = result });
         }
 
         private int GetUserId()
