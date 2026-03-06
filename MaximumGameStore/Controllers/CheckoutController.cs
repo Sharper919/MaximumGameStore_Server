@@ -31,8 +31,8 @@ namespace MaximumGameStore.Controllers
                     .ThenInclude(ci => ci.Game)
                 .FirstOrDefaultAsync(c => c.UserId == userId && c.Status == "Active");
 
-            if (cart == null || !cart.CartItems.Any())
-                BadRequest("Cart is empty");
+            if (cart == null || cart.CartItems == null || !cart.CartItems.Any())
+                return BadRequest("Cart is empty");
 
             var ownedGameIds = await _context.OrderItems
                 .Where(oi => oi.Order.UserId == userId)
