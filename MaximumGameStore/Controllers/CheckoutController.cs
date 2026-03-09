@@ -10,7 +10,7 @@ using System.Security.Claims;
 
 namespace MaximumGameStore.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/checkout")]
     [ApiController]
     [Authorize]
     public class CheckoutController : ControllerBase
