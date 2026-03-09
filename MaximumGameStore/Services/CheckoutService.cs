@@ -103,7 +103,7 @@ namespace MaximumGameStore.Services
             }
         }
 
-        public async Task<CheckoutResponseDto> CheckoutAsync(int userId, int gameId, CheckoutDto dto)
+        public async Task<CheckoutResponseDto> BuyNowAsync(int userId, int gameId, CheckoutDto dto)
         {
             var owned = await _context.OrderItems
                 .AnyAsync(oi => oi.GameId == gameId && oi.Order.UserId == userId && oi.Order.Status == "Paid");
@@ -131,7 +131,7 @@ namespace MaximumGameStore.Services
                     UserId = userId,
                     DateTimeOrder = DateTime.UtcNow,
                     TotalAmount = game.Price,
-                    Status = "Success"
+                    Status = "Paid"
                 };
 
                 _context.Orders.Add(order);
@@ -153,7 +153,7 @@ namespace MaximumGameStore.Services
                     CardType = dto.CardType,
                     DateTimePayment = DateTime.UtcNow,
                     Amount = game.Price,
-                    PaymentStatus = "Paid"
+                    PaymentStatus = "Success"
                 };
 
                 _context.CardPayments.Add(payment);

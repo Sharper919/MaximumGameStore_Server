@@ -40,7 +40,7 @@ namespace MaximumGameStore.Controllers
         {
             int userId = GetUserId();
 
-            var result = await _checkoutService.CheckoutAsync(userId, gameId, dto);
+            var result = await _checkoutService.BuyNowAsync(userId, gameId, dto);
 
             if (result.OrderId == null)
                 return BadRequest(result.ResponseMassage);
