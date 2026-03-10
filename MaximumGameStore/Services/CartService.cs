@@ -15,23 +15,23 @@ namespace MaximumGameStore.Services
             _context = context;
         }
 
-        public async Task<string> AddGameAsync(int userId, int gameId)
+        public async Task<(string massage, int statusCode)> AddGameAsync(int userId, int gameId)
         {
             var game = await _context.Games.FindAsync(gameId);
 
-            if (game == null) return "Game not found";
+            if (game == null) return ("Game not found", 404);
 
             bool alreadyOwned = await _context.OrderItems
                 .AnyAsync(oi => oi.GameId == gameId && oi.Order.UserId == userId);
 
-            if (alreadyOwned) return "You already own this game";
+            if (alreadyOwned) return ("You already own this game", 400);
 
             var cart = await GetOrCreateActiveCart(userId);
 
             bool exist = await _context.CartItems
                 .AnyAsync(ci => ci.GameId == gameId && ci.CartId == cart.Id);
 
-            if (exist) return "Game already in cart";
+            if (exist) return ("Game already in cart", 400);
 
             CartItem cartItem = new CartItem
             {
@@ -44,7 +44,7 @@ namespace MaximumGameStore.Services
             cart.DateTimeUpdate = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
-            return "Game added to cart";
+            return ("Game added to cart", 200);
         }
 
         public async Task<string> ClearCartAsync(int userId)
@@ -84,20 +84,20 @@ namespace MaximumGameStore.Services
             };
         }
 
-        public async Task<string> RemoveGameAsync(int userId, int gameId)
+        public async Task<(string massage, int statusCode)> RemoveGameAsync(int userId, int gameId)
         {
             var cart = await GetOrCreateActiveCart(userId);
 
             var item = await _context.CartItems
                 .FirstOrDefaultAsync(ci => ci.GameId == gameId && ci.CartId == cart.Id);
 
-            if (item == null) return "Not found";
+            if (item == null) return ("Not found", 404);
 
             _context.CartItems.Remove(item);
             cart.DateTimeUpdate = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
-            return "Game removed from cart";
+            return ("Game removed from cart", 200);
         }
 
         private async Task<Cart> GetOrCreateActiveCart(int userId)

@@ -1,6 +1,7 @@
 ﻿using MaximumGameStore.Data;
 using MaximumGameStore.DTOs;
 using MaximumGameStore.Services.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace MaximumGameStore.Services
@@ -14,16 +15,16 @@ namespace MaximumGameStore.Services
             _context = context;
         }
 
-        public async Task<string> DeleteUserAsync(int userId)
+        public async Task<(string massage, int statusCode)> DeleteUserAsync(int userId)
         {
             var user = await _context.Users.FindAsync(userId);
 
-            if (user == null || user.IsDeleted) return "Not found";
+            if (user == null || user.IsDeleted) return ("Not found", 404);
 
             user.IsDeleted = true;
             await _context.SaveChangesAsync();
 
-            return "Account deactivated";
+            return ("Account deactivated", 200);
         }
 
         public async Task<List<UserGamesDto>> GetUserGamesAsync(int userId)
@@ -52,46 +53,46 @@ namespace MaximumGameStore.Services
                 }).FirstOrDefaultAsync();
         }
 
-        public async Task<string> UpdateUserNameAsync(int userId, UpdateUserNameDto dto)
+        public async Task<(string massage, int statusCode)> UpdateUserNameAsync(int userId, UpdateUserNameDto dto)
         {
             string newUserName = dto.NewUserName.Trim();
 
             var user = await _context.Users.FindAsync(userId);
 
-            if (user == null || user.IsDeleted) return "Not found";
+            if (user == null || user.IsDeleted) return ("Not found", 404);
 
             if (string.IsNullOrWhiteSpace(newUserName))
-                return "Username is empty";
+                return ("Username is empty", 400);
 
             bool exists = await _context.Users
                 .AnyAsync(u => u.Name == newUserName && u.Id != userId && !u.IsDeleted);
 
-            if (exists) return "Username already taken";
+            if (exists) return ("Username already taken", 400);
 
             user.Name = newUserName;
             await _context.SaveChangesAsync();
 
-            return "User name updated";
+            return ("User name updated", 200);
         }
 
-        public async Task<string> UpdateUserPasswordAsync(int userId, UpdateUserPasswordDto dto)
+        public async Task<(string massage, int statusCode)> UpdateUserPasswordAsync(int userId, UpdateUserPasswordDto dto)
         {
             PasswordHasher hasher = new PasswordHasher();
 
             var user = await _context.Users.FindAsync(userId);
 
-            if (user == null || user.IsDeleted) return "Not found";
+            if (user == null || user.IsDeleted) return ("Not found", 404);
 
             if (!hasher.Verify(dto.OldPassword, user.PasswordHash))
-                return "Old password is incorrect";
+                return ("Old password is incorrect", 400);
 
             if (hasher.Verify(dto.NewPassword, user.PasswordHash))
-                return "This is the old password";
+                return ("This is the old password", 400);
 
             user.PasswordHash = hasher.Hash(dto.NewPassword);
             await _context.SaveChangesAsync();
 
-            return "Password updated";
+            return ("Password updated", 200);
         }
     }
 }

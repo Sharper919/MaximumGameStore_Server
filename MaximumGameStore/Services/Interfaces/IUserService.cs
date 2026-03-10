@@ -6,8 +6,8 @@ namespace MaximumGameStore.Services.Interfaces
     {
         Task<UserInfoDto?> GetUserInfoAsync(int userId);
         Task<List<UserGamesDto>> GetUserGamesAsync(int userId);
-        Task<string> UpdateUserNameAsync(int userId, UpdateUserNameDto dto);
-        Task<string> UpdateUserPasswordAsync(int userId, UpdateUserPasswordDto dto);
-        Task<string> DeleteUserAsync(int userId);
+        Task<(string massage, int statusCode)> UpdateUserNameAsync(int userId, UpdateUserNameDto dto);
+        Task<(string massage, int statusCode)> UpdateUserPasswordAsync(int userId, UpdateUserPasswordDto dto);
+        Task<(string massage, int statusCode)> DeleteUserAsync(int userId);
     }
 }

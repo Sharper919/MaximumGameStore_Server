@@ -49,16 +49,13 @@ namespace MaximumGameStore.Controllers
         {
             int userId = GetUserId();
 
-            string result = await _userService.UpdateUserNameAsync(userId, dto);
+            var result = await _userService.UpdateUserNameAsync(userId, dto);
 
-            if (result == "Not found") return NotFound();
+            if (result.statusCode == 404) return NotFound(result.massage);
 
-            if (result == "Username is empty")
-                return BadRequest(result);
+            if (result.statusCode == 400) return BadRequest(result.massage);
 
-            if (result == "Username already taken") return BadRequest(result);
-
-            return Ok(new { message = result });
+            return Ok(new { message = result.massage });
         }
 
         [HttpPut("update/password")]
@@ -68,15 +65,11 @@ namespace MaximumGameStore.Controllers
 
             var result = await _userService.UpdateUserPasswordAsync(userId, dto);
 
-            if (result == "Not found") return NotFound();
+            if (result.statusCode == 404) return NotFound(result.massage);
 
-            if (result == "Old password is incorrect")
-                return BadRequest(result);
+            if (result.statusCode == 400) return BadRequest(result.massage);
 
-            if (result == "This is the old password")
-                return BadRequest(result);
-
-            return Ok(new { message = result });
+            return Ok(new { message = result.massage });
         }
 
         [HttpPut("delete")]
@@ -84,11 +77,11 @@ namespace MaximumGameStore.Controllers
         {
             int userId = GetUserId();
 
-            string result = await _userService.DeleteUserAsync(userId);
+            var result = await _userService.DeleteUserAsync(userId);
 
-            if (result == "Not found") return NotFound();
+            if (result.statusCode == 404) return NotFound(result.massage);
 
-            return Ok(new { message = result });
+            return Ok(new { message = result.massage });
         }
     }
 }

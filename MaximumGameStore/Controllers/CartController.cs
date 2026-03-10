@@ -30,11 +30,10 @@ namespace MaximumGameStore.Controllers
 
             var result = await _cartService.AddGameAsync(userId, gameId);
 
-            if (result == "Game not found") return NotFound();
-            if (result == "You already own this game") return BadRequest(result);
-            if (result == "Game already in cart") return BadRequest(result);
+            if (result.statusCode == 404) return NotFound(result.massage);
+            if (result.statusCode == 400) return BadRequest(result.massage);
 
-            return Ok(new { message = result });
+            return Ok(new { message = result.massage });
         }
 
         [HttpDelete("remove/{gameId:int}")]
@@ -44,9 +43,9 @@ namespace MaximumGameStore.Controllers
 
             var result = await _cartService.RemoveGameAsync(userId, gameId);
 
-            if (result == "Not found") return NotFound();
+            if (result.statusCode == 404) return NotFound(result.massage);
 
-            return Ok(new { message = result });
+            return Ok(new { message = result.massage });
         }
 
         [HttpDelete("clear")]
