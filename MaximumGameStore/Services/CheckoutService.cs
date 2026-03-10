@@ -14,7 +14,7 @@ namespace MaximumGameStore.Services
             _context = context;
         }
 
-        public async Task<CheckoutResponseDto> CheckoutAsync(int userId, CheckoutDto dto)
+        public async Task<(CheckoutResponseDto? dto, int statusCode, string massage)> CheckoutAsync(int userId, CheckoutDto dto)
         {
             var cart = await _context.Carts
                 .Include(c => c.CartItems)
@@ -22,12 +22,8 @@ namespace MaximumGameStore.Services
                 .FirstOrDefaultAsync(c => c.UserId == userId && c.Status == "Active");
 
             if (cart == null || cart.CartItems == null || !cart.CartItems.Any())
-                return new CheckoutResponseDto
-                {
-                    OrderId = null,
-                    ResponseMassage = "Cart is empty"
-                };
-
+                return (null, 400, "Cart is empty");
+                    
             var ownedGameIds = await _context.OrderItems
                 .Where(oi => oi.Order.UserId == userId)
                 .Select(oi => oi.GameId)
@@ -35,11 +31,7 @@ namespace MaximumGameStore.Services
 
             var duplicate = cart.CartItems.Any(ci => ownedGameIds.Contains(ci.GameId));
 
-            if (duplicate) return new CheckoutResponseDto
-            {
-                OrderId = null,
-                ResponseMassage = "One or more games already owned"
-            };
+            if (duplicate) return (null, 400, "One or more games already owned");
 
             decimal total = cart.CartItems.Sum(ci => ci.Game.Price);
 
@@ -86,41 +78,29 @@ namespace MaximumGameStore.Services
 
                 await transaction.CommitAsync();
 
-                return new CheckoutResponseDto
+                return (new CheckoutResponseDto
                 {
                     OrderId = order.Id,
                     ResponseMassage = "Checkout successful"
-                };
+                }, 200, "Checkout successful");
             }
             catch
             {
                 await transaction.RollbackAsync();
-                return new CheckoutResponseDto
-                {
-                    OrderId = null,
-                    ResponseMassage = "Checkout failed"
-                };
+                return (null, 500, "Checkout failed"); //StatusCode(500, "Checkout failed");
             }
         }
 
-        public async Task<CheckoutResponseDto> BuyNowAsync(int userId, int gameId, CheckoutDto dto)
+        public async Task<(CheckoutResponseDto? dto, int statusCode, string massage)> BuyNowAsync(int userId, int gameId, CheckoutDto dto)
         {
             var owned = await _context.OrderItems
                 .AnyAsync(oi => oi.GameId == gameId && oi.Order.UserId == userId && oi.Order.Status == "Paid");
 
-            if (owned) return new CheckoutResponseDto
-            {
-                OrderId = null,
-                ResponseMassage = "You already own this game"
-            };
+            if (owned) return (null, 400, "You already own this game");
 
             var game = await _context.Games.FindAsync(gameId);
 
-            if (game == null) return new CheckoutResponseDto
-            {
-                OrderId = null,
-                ResponseMassage = "Game not found"
-            };
+            if (game == null) return (null, 404, "Game not found");
 
             using var transaction = await _context.Database.BeginTransactionAsync();
 
@@ -161,20 +141,16 @@ namespace MaximumGameStore.Services
 
                 await transaction.CommitAsync();
 
-                return new CheckoutResponseDto
+                return (new CheckoutResponseDto
                 {
                     ResponseMassage = "Game purchased successfully",
                     OrderId = order.Id
-                };
+                }, 200, "Game purchased successfully");
             }
             catch
             {
                 await transaction.RollbackAsync();
-                return new CheckoutResponseDto
-                {
-                    ResponseMassage = "Checkout failed",
-                    OrderId = null
-                };
+                return (null, 500, "Checkout failed");
             }
         }
     }

@@ -29,10 +29,13 @@ namespace MaximumGameStore.Controllers
 
             var result = await _checkoutService.CheckoutAsync(userId, dto);
             
-            if (result.OrderId == null)
-                return BadRequest(result.ResponseMassage);
+            if (result.statusCode == 400)
+                return BadRequest(result.massage);
 
-            return Ok(result);
+            if (result.statusCode == 500)
+                return StatusCode(500, result.massage);
+
+            return Ok(result.dto);
         }
 
         [HttpPost("buy-now/{gameId:int}")]
@@ -42,10 +45,16 @@ namespace MaximumGameStore.Controllers
 
             var result = await _checkoutService.BuyNowAsync(userId, gameId, dto);
 
-            if (result.OrderId == null)
-                return BadRequest(result.ResponseMassage);
+            if (result.statusCode == 400)
+                return BadRequest(result.massage);
 
-            return Ok(result);
+            if (result.statusCode == 404)
+                return BadRequest(result.massage);
+
+            if (result.statusCode == 500)
+                return StatusCode(500, result.massage);
+
+            return Ok(result.dto);
         }
 
         private int GetUserId()
