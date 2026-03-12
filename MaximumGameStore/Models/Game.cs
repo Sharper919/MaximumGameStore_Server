@@ -17,6 +17,8 @@ public partial class Game
 
     public string? Description { get; set; }
 
+    public bool IsDeleted { get; set; }
+
     public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
 
     public virtual ICollection<GameDeveloper> GameDevelopers { get; set; } = new List<GameDeveloper>();
