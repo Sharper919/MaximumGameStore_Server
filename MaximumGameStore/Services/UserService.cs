@@ -15,6 +15,7 @@ namespace MaximumGameStore.Services
             _context = context;
         }
 
+        // user functions
         public async Task<(string massage, int statusCode)> DeleteUserAsync(int userId)
         {
             var user = await _context.Users.FindAsync(userId);
@@ -93,6 +94,31 @@ namespace MaximumGameStore.Services
             await _context.SaveChangesAsync();
 
             return ("Password updated", 200);
+        }
+
+        // admin functions
+        public async Task<List<UserInfoDto>> GetUsersAsync()
+        {
+            return await _context.Users.Where(u => !u.IsDeleted)
+                .Select(u => new UserInfoDto
+                {
+                    Id = u.Id,
+                    UserName = u.Name,
+                    Email = u.Email,
+                    CreatedAt = u.DateTimeRegistration
+                }).ToListAsync();
+        }
+
+        public async Task<bool> BlockUserAsync(int userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+
+            if (user == null || user.IsDeleted) return false;
+
+            user.IsDeleted = true;
+            await _context.SaveChangesAsync();
+
+            return true;
         }
     }
 }
