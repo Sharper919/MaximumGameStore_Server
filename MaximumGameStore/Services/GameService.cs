@@ -1,5 +1,6 @@
 ﻿using MaximumGameStore.Data;
 using MaximumGameStore.DTOs;
+using MaximumGameStore.Models;
 using MaximumGameStore.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +15,7 @@ namespace MaximumGameStore.Services
             _context = context;
         }
 
+        // user functions
         public async Task<List<GameListItemDto>> FilterAsync(int? genreId, 
             int? developerId, int? engineId, 
             int? serieId, int? publisherId, int? modeId)
@@ -154,6 +156,130 @@ namespace MaximumGameStore.Services
                     DirectX = sr.DirectX
                 })
                 .ToListAsync();
+        }
+
+        // admin functions
+        public async Task<int?> CreateGameAsync(CreateGameDto dto)
+        {
+            var game = new Game
+            {
+                Name = dto.Name,
+                Description = dto.Description,
+                Price = dto.Price,
+                ReleaseDate = dto.ReleaseDate,
+                SeriesId = dto.SeriesId
+            };
+
+            if (_context.Games.Any(g => g.Name == game.Name))
+            {
+                return null;
+            }
+
+            _context.Games.Add(game);
+            await _context.SaveChangesAsync();
+
+            int gameId = game.Id;
+
+            await AddRelations(gameId, dto);
+
+            return gameId;
+        }
+
+        public async Task<bool> UpdateGameAsync(int gameId, CreateGameDto dto)
+        {
+            var game = await _context.Games.FindAsync(gameId);
+
+            if (game == null) return false;
+
+            game.Name = dto.Name;
+            game.Description = dto.Description;
+            game.Price = dto.Price;
+            game.ReleaseDate = dto.ReleaseDate;
+            game.SeriesId = dto.SeriesId;
+
+            await RemoveRelations(gameId);
+            await AddRelations(gameId, dto);
+
+            return true;
+        }
+
+        public async Task<bool> DeleteGameAsync(int gameId)
+        {
+            var game = await _context.Games.FindAsync(gameId);
+
+            if (game == null) return false;
+
+            game.IsDeleted = true;
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        private async Task AddRelations(int gameId, CreateGameDto dto)
+        {
+            foreach (var id in dto.GenreIds)
+            {
+                _context.GameGenres.Add(new GameGenre
+                {
+                    GameId = gameId,
+                    GenreId = id
+                });
+            }
+
+            foreach (var id in dto.DeveloperIds)
+            {
+                _context.GameDevelopers.Add(new GameDeveloper
+                {
+                    GameId = gameId,
+                    DeveloperId = id
+                });
+            }
+
+            foreach (var id in dto.PublisherIds)
+            {
+                _context.GamePublishers.Add(new GamePublisher
+                {
+                    GameId = gameId,
+                    PublisherId = id
+                });
+            }
+
+            foreach (var id in dto.ModeIds)
+            {
+                _context.GameModes.Add(new GameMode
+                {
+                    GameId = gameId,
+                    ModeId = id
+                });
+            }
+
+            foreach (var id in dto.EngineIds)
+            {
+                _context.GameEngines.Add(new GameEngine
+                {
+                    GameId = gameId,
+                    EngineId = id
+                });
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task RemoveRelations(int gameId)
+        {
+            var genres = _context.GameGenres.Where(x => x.GameId == gameId);
+            var developers = _context.GameDevelopers.Where(x => x.GameId == gameId);
+            var publishers = _context.GamePublishers.Where(x => x.GameId == gameId);
+            var modes = _context.GameModes.Where(x => x.GameId == gameId);
+            var engines = _context.GameEngines.Where(x => x.GameId == gameId);
+
+            _context.GameGenres.RemoveRange(genres);
+            _context.GameDevelopers.RemoveRange(developers);
+            _context.GamePublishers.RemoveRange(publishers);
+            _context.GameModes.RemoveRange(modes);
+            _context.GameEngines.RemoveRange(engines);
+
+            await _context.SaveChangesAsync();
         }
     }
 }

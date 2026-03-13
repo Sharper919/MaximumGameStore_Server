@@ -1,0 +1,51 @@
+﻿using MaximumGameStore.DTOs;
+using MaximumGameStore.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+
+namespace MaximumGameStore.Controllers
+{
+    [Route("api/admin/games")]
+    [ApiController]
+    [Authorize(Roles = "Admin")]
+    public class AdminGamesController : ControllerBase
+    {
+        private readonly IGameService _gameService;
+
+        public AdminGamesController(IGameService gameService)
+        {
+            _gameService = gameService;
+        }
+
+        [HttpPost("create")]
+        public async Task<IActionResult> AddGame(CreateGameDto dto)
+        {
+            var gameId = await _gameService.CreateGameAsync(dto);
+
+            if (gameId == null) return BadRequest("Failed to create game");
+
+            return Ok(gameId);
+        }
+
+        [HttpPut("{gameId:int}/update")]
+        public async Task<IActionResult> UpdateGame(int gameId, CreateGameDto dto)
+        {
+            var result = await _gameService.UpdateGameAsync(gameId, dto);
+
+            if (!result) return NotFound();
+
+            return NoContent();
+        }
+
+        [HttpPut("{gameId:int}/delete")]
+        public async Task<IActionResult> DeleteGame(int gameId)
+        {
+            var result = await _gameService.DeleteGameAsync(gameId);
+
+            if (!result) return NotFound();
+
+            return NoContent();
+        }
+    }
+}
