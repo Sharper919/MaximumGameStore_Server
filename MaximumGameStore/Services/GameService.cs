@@ -161,6 +161,11 @@ namespace MaximumGameStore.Services
         // admin functions
         public async Task<int?> CreateGameAsync(CreateGameDto dto)
         {
+            if (_context.Games.Any(g => g.Name == dto.Name))
+            {
+                return null;
+            }
+
             var game = new Game
             {
                 Name = dto.Name,
@@ -169,11 +174,6 @@ namespace MaximumGameStore.Services
                 ReleaseDate = dto.ReleaseDate,
                 SeriesId = dto.SeriesId
             };
-
-            if (_context.Games.Any(g => g.Name == game.Name))
-            {
-                return null;
-            }
 
             _context.Games.Add(game);
             await _context.SaveChangesAsync();

@@ -1,6 +1,6 @@
 ﻿namespace MaximumGameStore.DTOs.GameDetails
 {
-    public class GameDetailsDto
+    public class GameFeaturesDto
     {
         public string Name { get; set; } = null!;
     }
