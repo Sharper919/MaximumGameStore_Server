@@ -1,6 +1,5 @@
 using MaximumGameStore.Data;
 using MaximumGameStore.Services;
-using MaximumGameStore.Services.GameDetailsServices;
 using MaximumGameStore.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -31,12 +30,7 @@ namespace MaximumGameStore
             builder.Services.AddScoped<ICartService, CartService>();
             builder.Services.AddScoped<ICheckoutService, CheckoutService>();
             builder.Services.AddScoped<ISystemRequirementService, SystemRequirementService>();
-            builder.Services.AddScoped<IGameFeaturesService, GenreService>();
-            builder.Services.AddScoped<IGameFeaturesService, EngineService>();
-            builder.Services.AddScoped<IGameFeaturesService, PublisherService>();
-            builder.Services.AddScoped<IGameFeaturesService, SerieService>();
-            builder.Services.AddScoped<IGameFeaturesService, ModeService>();
-            builder.Services.AddScoped<IGameFeaturesService, DeveloperService>();
+            builder.Services.AddScoped(typeof(IGameFeatureService<>), typeof(GameFeatureService<>));
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
