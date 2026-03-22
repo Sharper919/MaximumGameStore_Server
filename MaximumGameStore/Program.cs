@@ -31,6 +31,7 @@ namespace MaximumGameStore
             builder.Services.AddScoped<ICheckoutService, CheckoutService>();
             builder.Services.AddScoped<ISystemRequirementService, SystemRequirementService>();
             builder.Services.AddScoped(typeof(IGameFeatureService<>), typeof(GameFeatureService<>));
+            builder.Services.AddScoped<IGameImageService, GameImageService>();
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
