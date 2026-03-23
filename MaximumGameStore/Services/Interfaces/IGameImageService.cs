@@ -9,6 +9,5 @@ namespace MaximumGameStore.Services.Interfaces
         Task<GameImage?> Upload(UploadGameImageDto dto);
         Task<bool> Delete(int imageId);
         Task<bool> SetMain(int imageId);
-
     }
 }
