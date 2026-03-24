@@ -27,7 +27,7 @@ namespace MaximumGameStore.Services
 
         public async Task<GameImage?> Upload(UploadGameImageDto dto)
         {
-            var gameExists = await _context.Games.AnyAsync(g => g.Id == dto.GameId);
+            var gameExists = await _context.Games.AnyAsync(g => g.Id == dto.GameId && !g.IsDeleted);
             if (!gameExists) return null;
 
             // шлях до папки гри

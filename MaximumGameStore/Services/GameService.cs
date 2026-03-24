@@ -20,7 +20,7 @@ namespace MaximumGameStore.Services
             int? developerId, int? engineId, 
             int? serieId, int? publisherId, int? modeId)
         {
-            var query = _context.Games.AsNoTracking().AsQueryable();
+            var query = _context.Games.AsNoTracking().Where(g => !g.IsDeleted).AsQueryable();
 
             if (genreId.HasValue)
             {
@@ -73,7 +73,7 @@ namespace MaximumGameStore.Services
 
         public async Task<GameDetailsDto?> GetGameDetailsByIdAsync(int gameId)
         {
-            var game = await _context.Games.AsNoTracking().Where(g => g.Id == gameId)
+            var game = await _context.Games.AsNoTracking().Where(g => g.Id == gameId && !g.IsDeleted)
                 .Select(g => new GameDetailsDto
                 {
                     Id = g.Id,
@@ -105,7 +105,7 @@ namespace MaximumGameStore.Services
 
         public async Task<List<GameListItemDto>> GetGamesAsync(int take = 8)
         {
-            return await _context.Games.AsNoTracking()
+            return await _context.Games.AsNoTracking().Where(g => !g.IsDeleted)
                 .OrderByDescending(g => g.ReleaseDate)
                 .Take(take)
                 .Select(g => new GameListItemDto
@@ -122,7 +122,7 @@ namespace MaximumGameStore.Services
 
         public async Task<List<GameListItemDto>> GetGamesByNameAsync(string name)
         {
-            var query = _context.Games.AsNoTracking().AsQueryable();
+            var query = _context.Games.AsNoTracking().Where(g => !g.IsDeleted).AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(name))
             {
