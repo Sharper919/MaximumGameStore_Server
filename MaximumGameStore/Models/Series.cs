@@ -1,9 +1,10 @@
-﻿using System;
+﻿using MaximumGameStore.Models.Interfaces;
+using System;
 using System.Collections.Generic;
 
 namespace MaximumGameStore.Models;
 
-public partial class Series
+public partial class Series : IGameFeatureEntity
 {
     public int Id { get; set; }
 
