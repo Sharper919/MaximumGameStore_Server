@@ -50,6 +50,17 @@ namespace MaximumGameStore
                     };
                 });
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowFrontend",
+                    policy =>
+                    {
+                        policy.WithOrigins("http://localhost:3000")
+                              .AllowAnyHeader()
+                              .AllowAnyMethod();
+                    });
+            });
+
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -96,6 +107,8 @@ namespace MaximumGameStore
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseCors("AllowFrontend");
 
             app.MapControllers();
 

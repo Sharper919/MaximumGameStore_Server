@@ -43,10 +43,10 @@ namespace MaximumGameStore.Services
 
         public async Task<AuthResponseDto?> AuthenticateAsync(LoginDto dto)
         {
-            string userName = dto.UserName.Trim();
+            string email = dto.Email.Trim().ToLower();
 
             var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Name == userName && !u.IsDeleted);
+                .FirstOrDefaultAsync(u => u.Email == email && !u.IsDeleted);
 
             if (user == null || !_hasher.Verify(dto.Password, user.PasswordHash))
                 return null;
