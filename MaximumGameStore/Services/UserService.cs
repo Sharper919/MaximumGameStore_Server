@@ -33,7 +33,7 @@ namespace MaximumGameStore.Services
             return await _context.OrderItems.Where(oi => oi.Order.UserId == userId)
                 .Select(oi => new UserGamesDto
                 {
-                    Id = oi.Id,
+                    Id = oi.GameId,
                     Title = oi.Game.Name,
                     MainImage = oi.Game.GameImages.Where(gi => gi.IsMain)
                         .Select(gi => gi.ImagePath).FirstOrDefault(),

@@ -29,6 +29,7 @@ namespace MaximumGameStore
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<ICartService, CartService>();
             builder.Services.AddScoped<ICheckoutService, CheckoutService>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<ISystemRequirementService, SystemRequirementService>();
             builder.Services.AddScoped(typeof(IGameFeatureService<>), typeof(GameFeatureService<>));
             builder.Services.AddScoped<IGameImageService, GameImageService>();

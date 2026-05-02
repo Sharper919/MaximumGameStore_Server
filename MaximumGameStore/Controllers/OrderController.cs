@@ -1,7 +1,7 @@
-﻿using MaximumGameStore.Services.Interfaces;
+using MaximumGameStore.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace MaximumGameStore.Controllers
 {
@@ -17,9 +17,11 @@ namespace MaximumGameStore.Controllers
             _orderService = orderService;
         }
 
-        [HttpGet("{userId:int}")]
-        public async Task<IActionResult> GetUserOrders(int userId)
+        [HttpGet("my")]
+        public async Task<IActionResult> GetMyOrders()
         {
+            int userId = GetUserId();
+
             return Ok(await _orderService.GetUserOrdersAsync(userId));
         }
 
@@ -27,6 +29,12 @@ namespace MaximumGameStore.Controllers
         public async Task<IActionResult> GetAllOrders()
         {
             return Ok(await _orderService.GetAllOrdersAsync());
+        }
+
+        private int GetUserId()
+        {
+            var id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return int.Parse(id!);
         }
     }
 }
