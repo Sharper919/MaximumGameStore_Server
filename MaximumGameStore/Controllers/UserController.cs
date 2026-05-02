@@ -34,7 +34,7 @@ namespace MaximumGameStore.Controllers
             return Ok(userInfo);
         }
 
-        [HttpGet("user-games")]
+        [HttpGet("games")]
         public async Task<IActionResult> GetUserGames()
         {
             int userId = GetUserId();

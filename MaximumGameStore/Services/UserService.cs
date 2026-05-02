@@ -35,11 +35,10 @@ namespace MaximumGameStore.Services
                 {
                     Id = oi.Id,
                     Title = oi.Game.Name,
-                    Price = oi.PriceAtPurchase,
                     MainImage = oi.Game.GameImages.Where(gi => gi.IsMain)
                         .Select(gi => gi.ImagePath).FirstOrDefault(),
-                    PurchasedAt = oi.Order.DateTimeOrder
-                }).Distinct().ToListAsync();
+                    Genres = oi.Game.GameGenres.Select(gg => gg.Genre.Name).ToList()
+                }).ToListAsync();
         }
 
         public async Task<UserInfoDto?> GetUserInfoAsync(int userId)
