@@ -35,18 +35,6 @@ namespace MaximumGameStore.Services
             return requirement.Id;
         }
 
-        public async Task<bool> DeleteRequirementAsync(int requirementId)
-        {
-            var requirement = await _context.SystemRequirements.FindAsync(requirementId);
-
-            if (requirement == null) return false;
-
-            _context.SystemRequirements.Remove(requirement);
-            await _context.SaveChangesAsync();
-
-            return true;
-        }
-
         public async Task<bool> UpdateRequirementAsync(int requirementId, UpdateRequirementDto dto)
         {
             var requirement = await _context.SystemRequirements.FindAsync(requirementId);

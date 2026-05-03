@@ -20,29 +20,21 @@ namespace MaximumGameStore.Controllers.GameFeatureControllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var features = await _service.GetAll();
+            var features = await _service.GetAllAsync();
             return Ok(features);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(GameFeatureDto dto)
         {
-            var id = await _service.Create(dto.Name);
+            var id = await _service.CreateAsync(dto.Name);
             return Ok(id);
         }
 
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, GameFeatureDto dto)
         {
-            var result = await _service.Update(id, dto.Name);
-            if (!result) return NotFound();
-            return NoContent();
-        }
-
-        [HttpDelete("{id:int}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var result = await _service.Delete(id);
+            var result = await _service.UpdateAsync(id, dto.Name);
             if (!result) return NotFound();
             return NoContent();
         }

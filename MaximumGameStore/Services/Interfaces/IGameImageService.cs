@@ -5,9 +5,8 @@ namespace MaximumGameStore.Services.Interfaces
 {
     public interface IGameImageService
     {
-        Task<List<GameImage>> GetByGameId(int gameId);
-        Task<GameImage?> Upload(UploadGameImageDto dto);
-        Task<bool> Delete(int imageId);
-        Task<bool> SetMain(int imageId);
+        Task<List<GameImage>> GetByGameIdAsync(int gameId);
+        Task<GameImage?> UploadAsync(UploadGameImageDto dto);
+        Task<bool> SetMainAsync(int imageId);
     }
 }

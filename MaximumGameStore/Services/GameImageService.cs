@@ -17,7 +17,7 @@ namespace MaximumGameStore.Services
             _env = env;
         }
 
-        public async Task<List<GameImage>> GetByGameId(int gameId)
+        public async Task<List<GameImage>> GetByGameIdAsync(int gameId)
         {
             return await _context.GameImages
                 .Where(x => x.GameId == gameId)
@@ -25,7 +25,7 @@ namespace MaximumGameStore.Services
                 .ToListAsync();
         }
 
-        public async Task<GameImage?> Upload(UploadGameImageDto dto)
+        public async Task<GameImage?> UploadAsync(UploadGameImageDto dto)
         {
             var gameExists = await _context.Games.AnyAsync(g => g.Id == dto.GameId && !g.IsDeleted);
             if (!gameExists) return null;
@@ -74,22 +74,7 @@ namespace MaximumGameStore.Services
             return image;
         }
 
-        public async Task<bool> Delete(int imageId)
-        {
-            var image = await _context.GameImages.FindAsync(imageId);
-            if (image == null) return false;
-
-            var fullPath = Path.Combine(_env.WebRootPath, image.ImagePath.TrimStart('/'));
-
-            if (File.Exists(fullPath))
-                File.Delete(fullPath);
-
-            _context.GameImages.Remove(image);
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
-        public async Task<bool> SetMain(int imageId)
+        public async Task<bool> SetMainAsync(int imageId)
         {
             var image = await _context.GameImages.FindAsync(imageId);
             if (image == null) return false;

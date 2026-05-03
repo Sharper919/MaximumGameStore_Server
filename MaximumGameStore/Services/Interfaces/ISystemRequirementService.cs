@@ -6,6 +6,5 @@ namespace MaximumGameStore.Services.Interfaces
     {
             Task<int> AddRequirementsAsync(int gameId, AddRequirementsDto dto);
             Task<bool> UpdateRequirementAsync(int requirementId, UpdateRequirementDto dto);
-            Task<bool> DeleteRequirementAsync(int requirementId);
     }
 }

@@ -17,7 +17,7 @@ namespace MaximumGameStore.Services
             _dbSet = _context.Set<T>();
         }
 
-        public async Task<int> Create(string name)
+        public async Task<int> CreateAsync(string name)
         {
             var entity = new T
             {
@@ -30,24 +30,12 @@ namespace MaximumGameStore.Services
             return entity.Id;
         }
 
-        public async Task<bool> Delete(int Id)
-        {
-            var entity = await _dbSet.FindAsync(Id);
-
-            if (entity == null) return false;
-
-            _dbSet.Remove(entity);
-            await _context.SaveChangesAsync();
-
-            return true;
-        }
-
-        public async Task<List<GameFeatureDto>> GetAll()
+        public async Task<List<GameFeatureDto>> GetAllAsync()
         {
             return await _dbSet.Select(x => new GameFeatureDto { Name = x.Name }).ToListAsync();
         }
 
-        public async Task<bool> Update(int Id, string name)
+        public async Task<bool> UpdateAsync(int Id, string name)
         {
             var entity = await _dbSet.FindAsync(Id);
 

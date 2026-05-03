@@ -32,13 +32,5 @@ namespace MaximumGameStore.Controllers
             if (!result) return NotFound();
             return NoContent();
         }
-
-        [HttpDelete("{requirementId:int}/delete")]
-        public async Task<IActionResult> DeleteRequirement(int requirementId)
-        {
-            var result = await _requirementService.DeleteRequirementAsync(requirementId);
-            if (!result) return NotFound();
-            return NoContent();
-        }
     }
 }
