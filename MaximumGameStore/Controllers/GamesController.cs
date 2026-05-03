@@ -19,13 +19,13 @@ namespace MaximumGameStore.Controllers
             return Ok(await _gameService.GetGamesAsync());
         }
 
-        [HttpGet("filter-name")]
+        [HttpGet("filter/name")]
         public async Task<IActionResult> GetGamesByName([FromQuery] string search)
         {
             return Ok(await _gameService.GetGamesByNameAsync(search));
         }
 
-        [HttpGet("filter-features")]
+        [HttpGet("filter/features")]
         public async Task<IActionResult> GetGamesByFeatures([FromQuery] int? genreId, 
             [FromQuery] int? developerId, 
             [FromQuery] int? engineId, 

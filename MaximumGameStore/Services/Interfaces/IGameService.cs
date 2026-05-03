@@ -1,4 +1,5 @@
 ﻿using MaximumGameStore.DTOs;
+using MaximumGameStore.DTOs.Game;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MaximumGameStore.Services.Interfaces
@@ -17,6 +18,7 @@ namespace MaximumGameStore.Services.Interfaces
         Task<List<string>> GetGameImagesByIdAsync(int gameId);
 
         // admin functions
+        Task<List<GameAdminListItemDto>> GetAllGamesAsync();
         Task<int?> CreateGameAsync(CreateGameDto dto);
         Task<bool> UpdateGameAsync(int gameId, CreateGameDto dto);
         Task<bool> DeleteGameAsync(int gameId);

@@ -25,6 +25,7 @@ namespace MaximumGameStore.Controllers
             return Ok(await _orderService.GetUserOrdersAsync(userId));
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAllOrders()
         {

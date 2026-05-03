@@ -49,6 +49,7 @@ namespace MaximumGameStore.Services
                     Id = ui.Id,
                     UserName = ui.Name,
                     Email = ui.Email,
+                    Role = ui.Role,
                     CreatedAt = ui.DateTimeRegistration
                 }).FirstOrDefaultAsync();
         }
@@ -104,6 +105,7 @@ namespace MaximumGameStore.Services
                     Id = u.Id,
                     UserName = u.Name,
                     Email = u.Email,
+                    Role = u.Role,
                     CreatedAt = u.DateTimeRegistration
                 }).ToListAsync();
         }

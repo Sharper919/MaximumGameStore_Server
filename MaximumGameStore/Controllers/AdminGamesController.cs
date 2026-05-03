@@ -18,6 +18,12 @@ namespace MaximumGameStore.Controllers
             _gameService = gameService;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetGames()
+        {
+            return Ok(await _gameService.GetAllGamesAsync());
+        }
+
         [HttpPost("create")]
         public async Task<IActionResult> AddGame(CreateGameDto dto)
         {

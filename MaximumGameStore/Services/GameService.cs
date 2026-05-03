@@ -1,5 +1,6 @@
 ﻿using MaximumGameStore.Data;
 using MaximumGameStore.DTOs;
+using MaximumGameStore.DTOs.Game;
 using MaximumGameStore.Models;
 using MaximumGameStore.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -159,6 +160,20 @@ namespace MaximumGameStore.Services
         }
 
         // admin functions
+        public async Task<List<GameAdminListItemDto>> GetAllGamesAsync()
+        {
+            return await _context.Games.AsNoTracking().Where(g => !g.IsDeleted)
+                .Select(g => new GameAdminListItemDto
+                {
+                    Id = g.Id,
+                    Title = g.Name,
+                    Price = g.Price,
+                    MainImage = g.GameImages.Where(gi => gi.IsMain)
+                        .Select(gi => gi.ImagePath).FirstOrDefault(),
+                    ReleaseDate = g.ReleaseDate,
+                }).ToListAsync();
+        }
+
         public async Task<int?> CreateGameAsync(CreateGameDto dto)
         {
             if (_context.Games.Any(g => g.Name == dto.Name))

@@ -61,7 +61,8 @@ namespace MaximumGameStore.Services
             var response = new AuthResponseDto
             {
                 Token = token,
-                UserName = user.Name
+                UserName = user.Name,
+                Role = user.Role
             };
 
             return response;
