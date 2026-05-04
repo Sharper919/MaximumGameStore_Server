@@ -19,6 +19,16 @@ namespace MaximumGameStore.Services
 
         public async Task<int> CreateAsync(string name)
         {
+            name = name.Trim();
+
+            var existing = await _dbSet
+                .FirstOrDefaultAsync(x => x.Name.ToLower() == name.ToLower());
+
+            if (existing != null)
+            {
+                return existing.Id;
+            }
+
             var entity = new T
             {
                 Name = name
@@ -32,19 +42,14 @@ namespace MaximumGameStore.Services
 
         public async Task<List<GameFeatureDto>> GetAllAsync()
         {
-            return await _dbSet.Select(x => new GameFeatureDto { Name = x.Name }).ToListAsync();
-        }
-
-        public async Task<bool> UpdateAsync(int Id, string name)
-        {
-            var entity = await _dbSet.FindAsync(Id);
-
-            if (entity == null) return false;
-
-            entity.Name = name;
-            await _context.SaveChangesAsync();
-
-            return true;
+            return await _dbSet
+                .OrderBy(x => x.Name)
+                .Select(x => new GameFeatureDto
+                {
+                    Id = x.Id,
+                    Name = x.Name
+                })
+                .ToListAsync();
         }
     }
 }

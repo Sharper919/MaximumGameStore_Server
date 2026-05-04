@@ -7,6 +7,5 @@ namespace MaximumGameStore.Services.Interfaces
     {
         Task<List<GameFeatureDto>> GetAllAsync();
         Task<int> CreateAsync(string name);
-        Task<bool> UpdateAsync(int Id, string name);
     }
 }

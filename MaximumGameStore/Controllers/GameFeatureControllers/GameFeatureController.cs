@@ -1,4 +1,5 @@
 ﻿using MaximumGameStore.DTOs.GameDetails;
+using MaximumGameStore.DTOs.GameFeature;
 using MaximumGameStore.Models.Interfaces;
 using MaximumGameStore.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -25,18 +26,10 @@ namespace MaximumGameStore.Controllers.GameFeatureControllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(GameFeatureDto dto)
+        public async Task<IActionResult> Create(GameFeatureNameDto dto)
         {
             var id = await _service.CreateAsync(dto.Name);
             return Ok(id);
-        }
-
-        [HttpPut("{id:int}")]
-        public async Task<IActionResult> Update(int id, GameFeatureDto dto)
-        {
-            var result = await _service.UpdateAsync(id, dto.Name);
-            if (!result) return NotFound();
-            return NoContent();
         }
     }
 }
