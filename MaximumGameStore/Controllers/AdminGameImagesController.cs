@@ -18,26 +18,12 @@ namespace MaximumGameStore.Controllers
             _service = service;
         }
 
-        [HttpGet("game/{gameId:int}")]
-        public async Task<IActionResult> GetByGame(int gameId)
-        {
-            var images = await _service.GetByGameIdAsync(gameId);
-            return Ok(images);
-        }
-
         [HttpPost]
-        public async Task<IActionResult> Upload([FromForm] UploadGameImageDto dto)
+        public async Task<IActionResult> Upload([FromForm] UploadGameImagesDto dto)
         {
-            var result = await _service.UploadAsync(dto);
+            var result = await _service.UploadManyAsync(dto);
             if (result == null) return NotFound("Game not found");
             return Ok(result);
-        }
-
-        [HttpPut("{id:int}/set-main")]
-        public async Task<IActionResult> SetMain(int id)
-        {
-            var success = await _service.SetMainAsync(id);
-            return success ? Ok() : NotFound();
         }
     }
 }

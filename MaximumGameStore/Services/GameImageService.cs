@@ -17,78 +17,60 @@ namespace MaximumGameStore.Services
             _env = env;
         }
 
-        public async Task<List<GameImage>> GetByGameIdAsync(int gameId)
-        {
-            return await _context.GameImages
-                .Where(x => x.GameId == gameId)
-                .OrderBy(x => x.SortOrder)
-                .ToListAsync();
-        }
-
-        public async Task<GameImage?> UploadAsync(UploadGameImageDto dto)
+        public async Task<List<GameImage>?> UploadManyAsync(UploadGameImagesDto dto)
         {
             var gameExists = await _context.Games.AnyAsync(g => g.Id == dto.GameId && !g.IsDeleted);
             if (!gameExists) return null;
 
-            // шлях до папки гри
+            if (dto.Images.Count == 0)
+            {
+                return new List<GameImage>();
+            }
+
+            var mainImageIndex = dto.MainImageIndex >= 0 && dto.MainImageIndex < dto.Images.Count
+                ? dto.MainImageIndex
+                : 0;
+
             var gameFolder = Path.Combine(_env.WebRootPath, "images", "games", dto.GameId.ToString());
             Directory.CreateDirectory(gameFolder);
 
-            // ім'я файлу
-            var fileName = $"{Guid.NewGuid()}{Path.GetExtension(dto.Image.FileName)}";
-            var fullPath = Path.Combine(gameFolder, fileName);
+            var oldMain = await _context.GameImages
+                .Where(x => x.GameId == dto.GameId && x.IsMain)
+                .ToListAsync();
 
-            // збереження файлу
-            using (var stream = new FileStream(fullPath, FileMode.Create))
-            {
-                await dto.Image.CopyToAsync(stream);
-            }
+            foreach (var img in oldMain)
+                img.IsMain = false;
 
-            // якщо головне — скидаємо попереднє
-            if (dto.IsMain)
-            {
-                var oldMain = await _context.GameImages
-                    .Where(x => x.GameId == dto.GameId && x.IsMain)
-                    .ToListAsync();
-
-                foreach (var img in oldMain)
-                    img.IsMain = false;
-            }
-
-            // порядок сортування
             var maxSort = await _context.GameImages
                 .Where(x => x.GameId == dto.GameId)
                 .MaxAsync(x => (int?)x.SortOrder) ?? 0;
 
-            var image = new GameImage
+            var uploadedImages = new List<GameImage>();
+
+            for (var index = 0; index < dto.Images.Count; index++)
             {
-                GameId = dto.GameId,
-                ImagePath = $"/images/games/{dto.GameId}/{fileName}",
-                IsMain = dto.IsMain,
-                SortOrder = maxSort + 1
-            };
+                var file = dto.Images[index];
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+                var fullPath = Path.Combine(gameFolder, fileName);
 
-            _context.GameImages.Add(image);
+                using (var stream = new FileStream(fullPath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                uploadedImages.Add(new GameImage
+                {
+                    GameId = dto.GameId,
+                    ImagePath = $"/images/games/{dto.GameId}/{fileName}",
+                    IsMain = index == mainImageIndex,
+                    SortOrder = maxSort + index + 1
+                });
+            }
+
+            _context.GameImages.AddRange(uploadedImages);
             await _context.SaveChangesAsync();
 
-            return image;
-        }
-
-        public async Task<bool> SetMainAsync(int imageId)
-        {
-            var image = await _context.GameImages.FindAsync(imageId);
-            if (image == null) return false;
-
-            var images = await _context.GameImages
-                .Where(x => x.GameId == image.GameId)
-                .ToListAsync();
-
-            foreach (var img in images)
-                img.IsMain = false;
-
-            image.IsMain = true;
-            await _context.SaveChangesAsync();
-            return true;
+            return uploadedImages;
         }
     }
 }
