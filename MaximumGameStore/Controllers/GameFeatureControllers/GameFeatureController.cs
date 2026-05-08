@@ -19,6 +19,7 @@ namespace MaximumGameStore.Controllers.GameFeatureControllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAll()
         {
             var features = await _service.GetAllAsync();
