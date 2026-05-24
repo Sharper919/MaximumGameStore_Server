@@ -87,7 +87,7 @@ namespace MaximumGameStore.Services
             catch
             {
                 await transaction.RollbackAsync();
-                return (null, 500, "Checkout failed"); //StatusCode(500, "Checkout failed");
+                return (null, 500, "Checkout failed");
             }
         }
 

@@ -7,7 +7,7 @@ namespace MaximumGameStore.Services.Interfaces
     public interface IGameService
     {
         // user functions
-        Task<List<GameListItemDto>> GetGamesAsync(int take = 8);
+        Task<List<GameListItemDto>> GetGamesAsync(/*int take = 8*/);
         Task<List<GameListItemDto>> GetGamesByNameAsync(string name);
         Task<List<GameListItemDto>> FilterAsync(int? genreId,
             int? developerId, int? engineId,
@@ -20,7 +20,6 @@ namespace MaximumGameStore.Services.Interfaces
         // admin functions
         Task<List<GameAdminListItemDto>> GetAllGamesAsync();
         Task<int?> CreateGameAsync(CreateGameDto dto);
-        Task<bool> UpdateGameAsync(int gameId, CreateGameDto dto);
         Task<bool> DeleteGameAsync(int gameId);
     }
 }

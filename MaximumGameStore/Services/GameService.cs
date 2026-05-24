@@ -104,11 +104,11 @@ namespace MaximumGameStore.Services
                 .ToListAsync();
         }
 
-        public async Task<List<GameListItemDto>> GetGamesAsync(int take = 8)
+        public async Task<List<GameListItemDto>> GetGamesAsync(/*int take = 8*/)
         {
             return await _context.Games.AsNoTracking().Where(g => !g.IsDeleted)
                 .OrderByDescending(g => g.ReleaseDate)
-                .Take(take)
+                //.Take(take)
                 .Select(g => new GameListItemDto
                 {
                     Id = g.Id,
@@ -200,24 +200,6 @@ namespace MaximumGameStore.Services
             return gameId;
         }
 
-        public async Task<bool> UpdateGameAsync(int gameId, CreateGameDto dto)
-        {
-            var game = await _context.Games.FindAsync(gameId);
-
-            if (game == null) return false;
-
-            game.Name = dto.Name;
-            game.Description = dto.Description;
-            game.Price = dto.Price;
-            game.ReleaseDate = dto.ReleaseDate;
-            game.SeriesId = dto.SeriesId;
-
-            await RemoveRelations(gameId);
-            await AddRelations(gameId, dto);
-
-            return true;
-        }
-
         public async Task<bool> DeleteGameAsync(int gameId)
         {
             var game = await _context.Games.FindAsync(gameId);
@@ -276,23 +258,6 @@ namespace MaximumGameStore.Services
                     EngineId = id
                 });
             }
-
-            await _context.SaveChangesAsync();
-        }
-
-        private async Task RemoveRelations(int gameId)
-        {
-            var genres = _context.GameGenres.Where(x => x.GameId == gameId);
-            var developers = _context.GameDevelopers.Where(x => x.GameId == gameId);
-            var publishers = _context.GamePublishers.Where(x => x.GameId == gameId);
-            var modes = _context.GameModes.Where(x => x.GameId == gameId);
-            var engines = _context.GameEngines.Where(x => x.GameId == gameId);
-
-            _context.GameGenres.RemoveRange(genres);
-            _context.GameDevelopers.RemoveRange(developers);
-            _context.GamePublishers.RemoveRange(publishers);
-            _context.GameModes.RemoveRange(modes);
-            _context.GameEngines.RemoveRange(engines);
 
             await _context.SaveChangesAsync();
         }

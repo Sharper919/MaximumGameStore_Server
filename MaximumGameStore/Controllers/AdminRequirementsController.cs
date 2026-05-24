@@ -24,13 +24,5 @@ namespace MaximumGameStore.Controllers
             var requirementId = await _requirementService.AddRequirementsAsync(dto.GameId, dto);
             return Ok(requirementId);
         }
-
-        [HttpPut("{requirementId:int}/update")]
-        public async Task<IActionResult> UpdateRequirement(int requirementId, UpdateRequirementDto dto)
-        {
-            var result = await _requirementService.UpdateRequirementAsync(requirementId, dto);
-            if (!result) return NotFound();
-            return NoContent();
-        }
     }
 }

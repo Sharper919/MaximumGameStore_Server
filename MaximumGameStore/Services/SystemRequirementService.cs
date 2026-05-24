@@ -34,24 +34,5 @@ namespace MaximumGameStore.Services
 
             return requirement.Id;
         }
-
-        public async Task<bool> UpdateRequirementAsync(int requirementId, UpdateRequirementDto dto)
-        {
-            var requirement = await _context.SystemRequirements.FindAsync(requirementId);
-
-            if (requirement == null) return false;
-
-            requirement.RequirementType = dto.RequirementType;
-            requirement.Os = dto.Os;
-            requirement.Cpu = dto.Cpu;
-            requirement.Gpu = dto.Gpu;
-            requirement.RamGb = dto.RamGb;
-            requirement.StorageGb = dto.StorageGb;
-            requirement.DirectX = dto.DirectX;
-
-            await _context.SaveChangesAsync();
-
-            return true;
-        }
     }
 }

@@ -34,16 +34,6 @@ namespace MaximumGameStore.Controllers
             return Ok(gameId);
         }
 
-        [HttpPut("{gameId:int}/update")]
-        public async Task<IActionResult> UpdateGame(int gameId, CreateGameDto dto)
-        {
-            var result = await _gameService.UpdateGameAsync(gameId, dto);
-
-            if (!result) return NotFound();
-
-            return NoContent();
-        }
-
         [HttpPut("{gameId:int}/delete")]
         public async Task<IActionResult> DeleteGame(int gameId)
         {
