@@ -43,9 +43,7 @@ cd Server/MaximumGameStore/MaximumGameStore
 dotnet restore
 ```
 
-### 4. Налаштування бази даних
-
-У файлі `appsettings.json` потрібно вказати рядок підключення до MS SQL Server:
+### 4. Налаштування бази даних у файлі `appsettings.json`:
 
 ```json
 {
@@ -55,19 +53,7 @@ dotnet restore
 }
 ```
 
-Приклад для локального SQL Server:
-
-```json
-{
-  "ConnectionStrings": {
-    "MGStoreConnection": "Server=localhost;Database=MaximumGameStore;Trusted_Connection=True;TrustServerCertificate=True;"
-  }
-}
-```
-
-### 5. Налаштування JWT
-
-У файлі `appsettings.json` потрібно вказати параметри JWT:
+### 5. Налаштування JWT в `appsettings.json`:
 
 ```json
 {
@@ -79,25 +65,13 @@ dotnet restore
 }
 ```
 
-Параметр `Key` має бути достатньо довгим секретним ключем і не повинен публікуватися у відкритому доступі.
-
-### 6. Встановлення Entity Framework Core CLI
-
-Якщо інструмент `dotnet-ef` ще не встановлений, його можна встановити командою:
+### 6. Встановлення Entity Framework Core CLI:
 
 ```bash
 dotnet tool install --global dotnet-ef
 ```
 
-Якщо інструмент уже встановлений, його можна оновити:
-
-```bash
-dotnet tool update --global dotnet-ef
-```
-
-### 7. Застосування міграцій
-
-Для створення або оновлення структури бази даних потрібно виконати:
+### 7. Застосування міграцій:
 
 ```bash
 dotnet ef database update
@@ -105,7 +79,7 @@ dotnet ef database update
 
 Ця команда створить таблиці, зв'язки, індекси та обмеження відповідно до міграцій Entity Framework Core.
 
-### 8. Запуск серверної частини
+### 8. Запуск сервера
 
 ```bash
 dotnet run
