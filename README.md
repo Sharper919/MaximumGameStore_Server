@@ -1,6 +1,8 @@
 # Maximum Game Store API
 
-Серверна частина вебзастосунку **Maximum Game Store** - це ASP.NET Core Web API для вебмагазину комп'ютерних ігор. API забезпечує реєстрацію та авторизацію користувачів, роботу з каталогом ігор, кошиком, замовленнями, особистим кабінетом користувача та адміністративною панеллю.
+**Maximum Game Store API** - це ASP.NET Core Web API для вебмагазину комп'ютерних ігор. API забезпечує реєстрацію та авторизацію користувачів, роботу з каталогом ігор, кошиком, замовленнями, особистим кабінетом користувача та адміністративною панеллю.
+
+Клієнт - [Link Text](https://github.com/Sharper919/Maximum-game-store.git)
 
 ## Технологічний стек
 
@@ -31,19 +33,13 @@
 git clone <repository-url>
 ```
 
-### 2. Перехід до папки серверної частини
-
-```bash
-cd Server/MaximumGameStore/MaximumGameStore
-```
-
-### 3. Відновлення залежностей
+### 2. Відновлення залежностей
 
 ```bash
 dotnet restore
 ```
 
-### 4. Налаштування бази даних у файлі `appsettings.json`:
+### 3. Налаштування бази даних у файлі `appsettings.json`:
 
 ```json
 {
@@ -53,7 +49,7 @@ dotnet restore
 }
 ```
 
-### 5. Налаштування JWT в `appsettings.json`:
+### 4. Налаштування JWT в `appsettings.json`:
 
 ```json
 {
@@ -65,13 +61,13 @@ dotnet restore
 }
 ```
 
-### 6. Встановлення Entity Framework Core CLI:
+### 5. Встановлення Entity Framework Core CLI:
 
 ```bash
 dotnet tool install --global dotnet-ef
 ```
 
-### 7. Застосування міграцій:
+### 6. Застосування міграцій:
 
 ```bash
 dotnet ef database update
@@ -79,7 +75,7 @@ dotnet ef database update
 
 Ця команда створить таблиці, зв'язки, індекси та обмеження відповідно до міграцій Entity Framework Core.
 
-### 8. Запуск сервера
+### 7. Запуск сервера
 
 ```bash
 dotnet run
