@@ -1,7 +1,6 @@
 ﻿using MaximumGameStore.Data;
 using MaximumGameStore.DTOs;
 using MaximumGameStore.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace MaximumGameStore.Services

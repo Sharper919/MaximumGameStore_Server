@@ -2,7 +2,6 @@
 using MaximumGameStore.DTOs;
 using MaximumGameStore.Models;
 using MaximumGameStore.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace MaximumGameStore.Services
 {

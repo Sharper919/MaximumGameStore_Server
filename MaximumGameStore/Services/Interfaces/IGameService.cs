@@ -7,7 +7,7 @@ namespace MaximumGameStore.Services.Interfaces
     public interface IGameService
     {
         // user functions
-        Task<List<GameListItemDto>> GetGamesAsync(/*int take = 8*/);
+        Task<List<GameListItemDto>> GetGamesAsync();
         Task<List<GameListItemDto>> GetGamesByNameAsync(string name);
         Task<List<GameListItemDto>> FilterAsync(int? genreId,
             int? developerId, int? engineId,

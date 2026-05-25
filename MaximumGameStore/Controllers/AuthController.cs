@@ -1,12 +1,6 @@
-﻿using MaximumGameStore.Data;
-using MaximumGameStore.DTOs;
-using MaximumGameStore.Models;
-using MaximumGameStore.Services;
+﻿using MaximumGameStore.DTOs;
 using MaximumGameStore.Services.Interfaces;
-using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace MaximumGameStore.Controllers
 {

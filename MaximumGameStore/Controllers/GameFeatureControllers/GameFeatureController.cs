@@ -1,9 +1,7 @@
-﻿using MaximumGameStore.DTOs.GameDetails;
-using MaximumGameStore.DTOs.GameFeature;
+﻿using MaximumGameStore.DTOs.GameFeature;
 using MaximumGameStore.Models.Interfaces;
 using MaximumGameStore.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MaximumGameStore.Controllers.GameFeatureControllers

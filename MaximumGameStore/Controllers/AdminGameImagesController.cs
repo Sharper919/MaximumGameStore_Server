@@ -1,7 +1,6 @@
 ﻿using MaximumGameStore.DTOs.Images;
 using MaximumGameStore.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MaximumGameStore.Controllers

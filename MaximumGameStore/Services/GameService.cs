@@ -104,11 +104,10 @@ namespace MaximumGameStore.Services
                 .ToListAsync();
         }
 
-        public async Task<List<GameListItemDto>> GetGamesAsync(/*int take = 8*/)
+        public async Task<List<GameListItemDto>> GetGamesAsync()
         {
             return await _context.Games.AsNoTracking().Where(g => !g.IsDeleted)
                 .OrderByDescending(g => g.ReleaseDate)
-                //.Take(take)
                 .Select(g => new GameListItemDto
                 {
                     Id = g.Id,
