@@ -2,7 +2,7 @@
 
 **Maximum Game Store API** - це ASP.NET Core Web API для вебмагазину комп'ютерних ігор. API забезпечує реєстрацію та авторизацію користувачів, роботу з каталогом ігор, кошиком, замовленнями, особистим кабінетом користувача та адміністративною панеллю.
 
-Клієнт - [Link Text](https://github.com/Sharper919/Maximum-game-store.git)
+[Клієнт](https://github.com/Sharper919/Maximum-game-store.git)
 
 ## Технологічний стек
 
